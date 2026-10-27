@@ -1,0 +1,150 @@
+"""Generates src/data/mockData.json with fully fictional, randomly generated data.
+
+Run:  python3 scripts/generate-mock-data.py
+Nothing here comes from a real company, WMS or database.
+"""
+import json, random
+from pathlib import Path
+
+random.seed(42)
+
+COLLABORATORS = [
+    ("ALEX", 0.62), ("BIANCA", 0.35), ("CARLOS", 0.71), ("DAVI", 0.48),
+    ("ELISA", 0.22), ("FABIO", 0.66), ("GIOVANA", 0.40), ("HUGO", 0.55),
+    ("ISABEL", 0.30), ("JONAS", 0.74), ("KARINA", 0.45), ("LEO", 0.58),
+    ("MARINA", 0.37), ("NICOLAS", 0.69), ("OTAVIO", 0.51), ("PAULA", 0.27),
+]
+
+# Raw carrier names as a WMS would send them (classification/renaming happens in the app).
+CARRIERS = [
+    # (raw title, weight)
+    ("SWIFTLANE EXPRESS LOGISTICA LTDA", 9), ("NLX", 11), ("VELOCE", 13),
+    ("CRX CORELOG", 7), ("ORBITA", 10), ("METRO ENTREGAS SP", 3),
+    ("MARKETPLACE ENVIOS", 23), ("RAPIDLOG", 15), ("BZR TECNOLOGIA", 6),
+    ("TITAN", 5), ("RETIRA LOJA", 1),
+]
+
+STATUSES = [
+    ("AG. FORMAÇÃO DE ROMANEIO/ONDA", 0.12),
+    ("AG. SEPARAÇÃO", 0.22),
+    ("SEPARAÇÃO CONCLUÍDA", 0.18),
+    ("FATURADO C/CARGA", 0.30),
+    ("FATURADO S/CARGA", 0.18),
+]
+TIPOS = [("NORMAL", 0.82), ("PERSONALIZAÇÃO", 0.18)]
+CANAIS = [(None, 0.70), ("COLMEIA", 0.18), ("EXPRESS", 0.12)]
+
+HOURS = list(range(8, 24))
+# Relative intensity of each hour (shift curve: day shift + lighter night shift).
+HOUR_CURVE = [0.7, 1.0, 1.05, 0.9, 0.55, 0.95, 1.0, 0.95, 0.8, 0.3, 0.2, 0.15, 0.5, 0.55, 0.45, 0.1]
+
+# Gestão Outbound periods (same order as src/lib/outbound-logic.ts PERIODS)
+PERIOD_WEIGHTS = [0.08, 0.10, 0.17, 0.11, 0.16, 0.19, 0.09, 0.035, 0.035, 0.03]
+PERIOD_TEAM = [12, 14, 14, 9, 13, 14, 12, 6, 6, 5]
+
+
+def descricao(ativo_min: int, inativo_min: int) -> str:
+    return (
+        f"<div><b>Ativo:</b> {ativo_min // 60}h {ativo_min % 60}min</div>"
+        f"<div><b>Inativo:</b> {inativo_min // 60}h {inativo_min % 60}min</div>"
+    )
+
+
+def collaborator_day(name: str, scale: float = 1.0):
+    ativo = random.randint(300, 470)
+    inativo = random.randint(5, 70)
+    rate = random.uniform(150, 235)  # orders per active hour
+    pedidos = int(rate * ativo / 60 * scale)
+    return {"name": name, "pedidos": pedidos, "ativoMin": ativo, "inativoMin": inativo}
+
+
+def split_hours(total: int) -> list[int]:
+    w = [c * random.uniform(0.75, 1.25) for c in HOUR_CURVE]
+    s = sum(w)
+    vals = [int(total * x / s) for x in w]
+    vals[1] += total - sum(vals)
+    return vals
+
+
+def weighted(options):
+    r = random.random()
+    acc = 0.0
+    for v, p in options:
+        acc += p
+        if r <= acc:
+            return v
+    return options[-1][0]
+
+
+# ---------- "Today" (live) panels ----------
+today = [collaborator_day(n) for n, _ in COLLABORATORS]
+productivity_panel = [
+    {"TITULO": c["name"], "VALOR": c["pedidos"], "DESCRICAO": descricao(c["ativoMin"], c["inativoMin"]), "DADO": "TODAY"}
+    for c in today
+]
+
+hourly_panel = []
+for c in today:
+    for h, v in zip(HOURS, split_hours(c["pedidos"])):
+        if v > 0:
+            hourly_panel.append({"TITULO": c["name"], "DESCRICAO": f"{h:02d} - {h + 1:02d}h", "VALOR": v})
+
+operational_panel = []
+ordem = 1
+for title, weight in CARRIERS:
+    buckets: dict[str, int] = {}
+    for _ in range(weight * 28):
+        st = weighted(STATUSES)
+        tp = weighted(TIPOS)
+        cn = weighted(CANAIS)
+        key = f"{st} - {tp}" + (f" - {cn}" if cn else "")
+        buckets[key] = buckets.get(key, 0) + 1
+    for key, val in sorted(buckets.items()):
+        operational_panel.append({"ORDEM": ordem, "TITULO": title, "DESCRICAO": key, "VALOR": val, "DADO": "TODAY"})
+        ordem += 1
+
+# ---------- History (last 30 days, Sundays off) ----------
+history = []
+for days_ago in range(1, 31):
+    weekday_factor = random.uniform(0.85, 1.15)
+    team = random.sample(COLLABORATORS, k=random.randint(12, 16))
+    colabs = []
+    for name, hub_share in team:
+        c = collaborator_day(name, weekday_factor)
+        share = min(0.95, max(0.05, hub_share + random.uniform(-0.08, 0.08)))
+        identified = int(c["pedidos"] * random.uniform(0.85, 0.97))
+        c["hub"] = int(identified * share)
+        c["terc"] = identified - c["hub"]
+        c["hourly"] = split_hours(c["pedidos"])
+        colabs.append(c)
+    total = sum(c["pedidos"] for c in colabs)
+    w = [x * random.uniform(0.85, 1.15) for x in PERIOD_WEIGHTS]
+    sw = sum(w)
+    cum, acc = [], 0.0
+    for x in w:
+        acc += x / sw
+        cum.append(round(total * acc))
+    cum[-1] = total
+    history.append({
+        "daysAgo": days_ago,
+        "pod": round(total * random.uniform(0.95, 1.08) / 50) * 50,
+        "pendentes": random.randint(0, 180),
+        "periodCumulative": cum,
+        "periodTeam": [max(1, t + random.randint(-2, 1)) for t in PERIOD_TEAM],
+        "collaborators": colabs,
+    })
+
+data = {
+    "_notice": "FICTIONAL DATA. Generated by scripts/generate-mock-data.py for portfolio/demo purposes only. "
+               "No real people, companies, orders or systems are represented.",
+    "collaborators": [{"name": n, "hubShare": s} for n, s in COLLABORATORS],
+    "productivityPanel": productivity_panel,
+    "hourlyPanel": hourly_panel,
+    "operationalPanel": operational_panel,
+    "outboundToday": {"pod": round(sum(c["pedidos"] for c in today) * 1.05 / 500) * 500, "pendentes": 120, "periodTeam": PERIOD_TEAM},
+    "history": history,
+}
+
+out = Path(__file__).resolve().parent.parent / "src" / "data" / "mockData.json"
+out.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+print(f"wrote {out} ({out.stat().st_size // 1024} KB)")

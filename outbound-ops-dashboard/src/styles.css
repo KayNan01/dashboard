@@ -1,0 +1,227 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-group-hub: var(--group-hub);
+  --color-group-terc: var(--group-terc);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-green: var(--brand-green);
+  --color-brand-blue-foreground: var(--brand-blue-foreground);
+  --color-colmeia: var(--colmeia);
+  --color-colmeia-foreground: var(--colmeia-foreground);
+  --color-express: var(--express);
+  --color-express-foreground: var(--express-foreground);
+  --font-display: "Saira Condensed", "Archivo", system-ui, sans-serif;
+  --font-sans: "Archivo", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.75rem;
+  --brand-blue: #192c53;
+  --brand-blue-foreground: oklch(0.98 0.006 240);
+  --brand-green: #00df5e;
+  --background: oklch(0.98 0.008 235);
+  --foreground: oklch(0.2 0.06 262);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.06 262);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.06 262);
+  --primary: var(--brand-green);
+  --primary-foreground: var(--brand-blue);
+  --express-foreground: oklch(0.98 0.006 240);
+  --secondary: oklch(0.95 0.02 235);
+  --secondary-foreground: oklch(0.22 0.06 262);
+  --muted: oklch(0.955 0.014 235);
+  --muted-foreground: oklch(0.5 0.04 250);
+  --accent: oklch(0.93 0.05 215);
+  --accent-foreground: oklch(0.22 0.06 262);
+  --destructive: oklch(0.58 0.22 25);
+  --destructive-foreground: oklch(0.99 0.003 250);
+  --success: var(--brand-green);
+  --success-foreground: var(--brand-blue);
+  --warning: oklch(0.72 0.16 75);
+  --warning-foreground: oklch(0.2 0.06 262);
+  --border: var(--brand-blue);
+  --input: var(--brand-blue);
+  --ring: var(--brand-green);
+  --chart-1: oklch(0.62 0.15 225);
+  --chart-2: oklch(0.7 0.19 128);
+  --chart-3: oklch(0.52 0.19 265);
+  --chart-4: oklch(0.62 0.22 330);
+  --chart-5: oklch(0.68 0.17 55);
+  --group-hub: oklch(0.58 0.18 255);
+  --group-terc: oklch(0.78 0.17 85);
+  --colmeia: #a855f7;
+  --colmeia-foreground: oklch(1 0 0);
+  --express: #22d3ee;
+  --express-foreground: oklch(0.2 0.06 262);
+}
+
+.dark {
+  --background: oklch(0.17 0.055 264);
+  --brand-blue-foreground: oklch(0.98 0.006 240);
+  --foreground: oklch(0.98 0.006 240);
+  --card: oklch(0.225 0.055 263);
+  --card-foreground: oklch(0.98 0.006 240);
+  --express-foreground: oklch(0.98 0.006 240);
+  --popover: oklch(0.225 0.055 263);
+  --popover-foreground: oklch(0.98 0.006 240);
+  --primary: var(--brand-green);
+  --primary-foreground: var(--brand-blue);
+  --secondary: oklch(0.28 0.055 263);
+  --secondary-foreground: oklch(0.98 0.006 240);
+  --muted: oklch(0.255 0.05 263);
+  --muted-foreground: oklch(0.74 0.03 235);
+  --accent: oklch(0.31 0.07 243);
+  --accent-foreground: oklch(0.98 0.006 240);
+  --destructive: oklch(0.66 0.22 25);
+  --destructive-foreground: oklch(0.98 0.006 240);
+  --success: var(--brand-green);
+  --success-foreground: var(--brand-blue);
+  --warning: oklch(0.84 0.15 82);
+  --warning-foreground: oklch(0.17 0.055 264);
+  --border: var(--brand-blue);
+  --input: var(--brand-blue);
+  --ring: var(--brand-green);
+  --chart-1: oklch(0.81 0.14 213);
+  --chart-2: oklch(0.88 0.2 128);
+  --chart-3: oklch(0.62 0.2 265);
+  --chart-4: oklch(0.72 0.22 330);
+  --chart-5: oklch(0.78 0.17 60);
+  --group-hub: oklch(0.7 0.18 255);
+  --group-terc: oklch(0.84 0.17 85);
+  --colmeia: #c084fc;
+  --colmeia-foreground: oklch(0.17 0.055 264);
+}
+
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: "Archivo", system-ui, sans-serif;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
+  }
+}
+
+@page {
+  size: A4 landscape;
+  margin: 6mm;
+}
+
+@media print {
+  /* Escala embutida: equivale a imprimir em ~82% e garante uma folha só */
+  body {
+    zoom: 0.82;
+  }
+  aside,
+  header,
+  .mobile-nav-tabs,
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  html,
+  body,
+  #root,
+  #app,
+  main,
+  [role="main"] {
+    background: white !important;
+    background-color: white !important;
+    background-image: none !important;
+    color: black !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  /* Garante que nenhum container com altura de tela deixe fundo escuro */
+  .min-h-screen,
+  .min-h-dvh,
+  .h-screen,
+  .h-dvh {
+    min-height: auto !important;
+    height: auto !important;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  .rounded-2xl,
+  .rounded-xl {
+    border-radius: 0.5rem !important;
+    box-shadow: none !important;
+  }
+  section,
+  .print\:avoid-break {
+    break-inside: avoid;
+  }
+  .print\:break-before {
+    break-before: page;
+  }
+  .print\:text-black {
+    color: black !important;
+  }
+  .print\:bg-white {
+    background: white !important;
+    background-color: white !important;
+  }
+  .print\:border-black {
+    border-color: black !important;
+  }
+}
+
