@@ -75,7 +75,7 @@ scripts/generate-mock-data.py # Regenerates the mock dataset
 
 ```bash
 # 1. Clone
-git clone https://github.com/<your-user>/outbound-ops-dashboard.git
+git clone https://github.com/kaynan01/outbound-ops-dashboard.git
 cd outbound-ops-dashboard
 
 # 2. Install dependencies
